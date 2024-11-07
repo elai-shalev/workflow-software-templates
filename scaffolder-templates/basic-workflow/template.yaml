@@ -214,6 +214,9 @@ spec:
                     const: "tekton_argocd"
                   quayConfig:
                     const: "Use Existing Repository"
+                    "ui:enumDisabled": ["No Quay Config Needed"]
+                    "ui:enumEnabled":
+                      ["Use Existing Repository", "Create New Repository"]
               then:
                 properties:
                   quayOrgName:
