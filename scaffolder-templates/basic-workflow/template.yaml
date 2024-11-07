@@ -184,8 +184,7 @@ spec:
                 - persistencePSQLServicePort
                 - persistencePSQLDatabaseName
     - title: Quay Configuration
-      required:
-        - quayConfig
+      type: object
       properties:
         quayConfig:
           title: Create a new Quay repository or use an existing one?
@@ -194,26 +193,15 @@ spec:
           enum:
             - "Use Existing Repository"
             - "Create New Repository"
-            - "No Quay Config"
       dependencies:
         quayConfig:
           allOf:
             - if:
                 properties:
                   CI:
-                    const: "none"
-              then:
-                properties:
-                  quayConfig:
-                    const: "No Quay Config"
-                    ui:disabled: true
-            - if:
-                properties:
-                  CI:
                     const: "tekton_argocd"
                   quayConfig:
                     const: "Use Existing Repository"
-                    ui:disabled: false
               then:
                 properties:
                   quayOrgName:
@@ -233,7 +221,6 @@ spec:
                     const: "tekton_argocd"
                   quayConfig:
                     const: "Create New Repository"
-                    ui:disabled: false
               then:
                 properties:
                   quayOrgName:
