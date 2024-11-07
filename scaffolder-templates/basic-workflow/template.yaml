@@ -200,6 +200,14 @@ spec:
             - if:
                 properties:
                   CI:
+                    const: "none"
+              then: 
+                properties:
+                  quayConfig:
+                    const: "No Config"
+            - if:
+                properties:
+                  CI:
                     const: "tekton_argocd"
                   quayConfig:
                     const: "Use Existing Repository"
