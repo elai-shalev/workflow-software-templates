@@ -203,14 +203,14 @@ spec:
                 properties:
                   quayConfig:
                     const: "Use Existing Repository"
-                    ui:widget: "enum"
+                    ui:widget: "string"
             - if:
                 properties:
                   CI:
                     const: "tekton_argocd"
                   quayConfig:
                     const: "Use Existing Repository"
-                    ui:widget: "enum"
+                    ui:widget: "string"
               then:
                 properties:
                   quayOrgName:
