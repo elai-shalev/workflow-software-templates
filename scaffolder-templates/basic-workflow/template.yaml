@@ -203,7 +203,7 @@ spec:
                 properties:
                   quayConfig:
                     const: "Use Existing Repository"
-                    ui:widget: "string"
+                    ui:widget: "hidden"
             - if:
                 properties:
                   CI:
@@ -230,7 +230,7 @@ spec:
                     const: "tekton_argocd"
                   quayConfig:
                     const: "Create New Repository"
-                    ui:widget: undefined
+                    ui:widget: "string"
               then:
                 properties:
                   quayOrgName:
