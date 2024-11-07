@@ -195,10 +195,6 @@ spec:
             - "Use Existing Repository"
             - "Create New Repository"
             - "No Quay Config Needed"
-        quaySkip:
-          title: No Quay config needed, proceed
-          type: string
-          ui:disabled: true
       dependencies:
         quayConfig:
           allOf:
@@ -208,8 +204,10 @@ spec:
                     const: none
               then:
                 properties:
-                  quaySkip:
-                    const: No Quay config needed, proceed
+                  quayConfig:
+                    const: "No Quay Config Needed"
+                    "ui:enumDisabled":
+                      ["Use Existing Repository", "Create New Repository"]
             - if:
                 properties:
                   CI:
