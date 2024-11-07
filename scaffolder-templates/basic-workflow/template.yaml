@@ -201,22 +201,9 @@ spec:
             - if:
                 properties:
                   CI:
-                    const: none
-              then:
-                properties:
-                  quayConfig:
-                    const: "No Quay Config Needed"
-                    "ui:enumDisabled":
-                      ["Use Existing Repository", "Create New Repository"]
-            - if:
-                properties:
-                  CI:
                     const: "tekton_argocd"
                   quayConfig:
                     const: "Use Existing Repository"
-                    "ui:enumDisabled": ["No Quay Config Needed"]
-                    "ui:enumEnabled":
-                      ["Use Existing Repository", "Create New Repository"]
               then:
                 properties:
                   quayOrgName:
