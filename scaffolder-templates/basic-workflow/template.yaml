@@ -201,7 +201,8 @@ spec:
                     const: "tekton_argocd"
                   quayConfig:
                     const: "Use Existing Repository"
-                    ui:widget: "text"
+                    ui:options:
+                      hidden: false
               then:
                 properties:
                   quayOrgName:
@@ -221,7 +222,8 @@ spec:
                     const: "tekton_argocd"
                   quayConfig:
                     const: "Create New Repository"
-                    ui:widget: "text"
+                    ui:options:
+                      hidden: false
               then:
                 properties:
                   quayOrgName:
@@ -279,7 +281,8 @@ spec:
                 properties:
                   quayConfig:
                     const: "Use Existing Repository"
-                    ui:widget: "hidden"
+                    ui:options:
+                      hidden: true
   steps:
     - id: createQuayRepository
       name: Create Quay Repository
