@@ -201,10 +201,10 @@ spec:
                 properties:
                   CI:
                     const: "none"
-              then: 
+              then:
                 properties:
                   quayConfig:
-                    const: "No Config"
+                    ui:emptyValue: "No"
             - if:
                 properties:
                   CI:
