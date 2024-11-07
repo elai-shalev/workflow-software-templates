@@ -198,15 +198,6 @@ spec:
             - if:
                 properties:
                   CI:
-                    const: "none"
-              then:
-                properties:
-                  quayConfig:
-                    const: "Use Existing Repository"
-                    ui:widget: "hidden"
-            - if:
-                properties:
-                  CI:
                     const: "tekton_argocd"
                   quayConfig:
                     const: "Use Existing Repository"
@@ -280,6 +271,15 @@ spec:
                   - token
                   - quayOrgName
                   - quayRepoName
+            - if:
+                properties:
+                  CI:
+                    const: "none"
+              then:
+                properties:
+                  quayConfig:
+                    const: "Use Existing Repository"
+                    ui:widget: "hidden"
   steps:
     - id: createQuayRepository
       name: Create Quay Repository
