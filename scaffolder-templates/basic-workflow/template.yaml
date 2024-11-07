@@ -194,7 +194,6 @@ spec:
           enum:
             - "Use Existing Repository"
             - "Create New Repository"
-            - "No Quay Config Needed"
       dependencies:
         quayConfig:
           allOf:
