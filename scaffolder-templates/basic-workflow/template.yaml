@@ -198,7 +198,7 @@ spec:
             - if:
                 properties:
                   CI:
-                    const: "tekton_argocd"
+                    const: "none"
               then:
                 properties:
                   quayConfig:
