@@ -118,6 +118,15 @@ spec:
           enumNames:
             - None
             - Tekton with ArgoCD
+          quayConfig:
+            title: Choose a prefered Quay configuration
+            properties:
+              type: string
+              default: "Use Existing Repository"
+              enum:
+                - "Use Existing Repository"
+                - "Create New Repository"
+                - "None"
       # See: https://github.com/redhat-developer/red-hat-developer-hub-software-templates/blob/3019e781b988e0548eb987eed3e522854ed8c52f/templates/github/quarkus-backend/template.yaml#L101
       dependencies:
         CI:
@@ -173,15 +182,6 @@ spec:
                   type: string
                   description: Name of the database to use for persistence
                   default: sonataflow
-                quayConfig:
-                  title: Choose a prefered Quay configuration
-                  properties:
-                    type: string
-                    default: "Use Existing Repository"
-                    enum:
-                      - "Use Existing Repository"
-                      - "Create New Repository"
-                      - "None"
               required:
                 - namespace
                 - argocdNamespace
