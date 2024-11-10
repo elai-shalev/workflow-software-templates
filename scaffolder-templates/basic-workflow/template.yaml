@@ -196,9 +196,9 @@ spec:
                               title: Quay Repository Name
                               type: string
                               description: The Quay repository name of the published workflow. The repository must exist before deploying the gitops
-                            required:
-                              - quayOrgName
-                              - quayRepoName
+                          required:
+                            - quayOrgName
+                            - quayRepoName
                         - properties:
                             quayConfig:
                               const: "Create New Repository"
@@ -242,13 +242,13 @@ spec:
                               title: Quay Namespace
                               type: string
                               description: The Quay namespace of the published workflow
-                            required:
-                              - visibility
-                              - newRepoDescription
-                              - quayNamespace
-                              - token
-                              - quayOrgName
-                              - quayRepoName
+                          required:
+                            - visibility
+                            - newRepoDescription
+                            - quayNamespace
+                            - token
+                            - quayOrgName
+                            - quayRepoName
               required:
                 - namespace
                 - argocdNamespace
