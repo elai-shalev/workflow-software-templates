@@ -118,15 +118,6 @@ spec:
           enumNames:
             - None
             - Tekton with ArgoCD
-        quayConfig:
-          title: Choose a prefered Quay configuration
-          properties:
-            type: string
-            default: "Use Existing Repository"
-            enum:
-              - "Use Existing Repository"
-              - "Create New Repository"
-              - "None"
       # See: https://github.com/redhat-developer/red-hat-developer-hub-software-templates/blob/3019e781b988e0548eb987eed3e522854ed8c52f/templates/github/quarkus-backend/template.yaml#L101
       dependencies:
         CI:
@@ -182,6 +173,83 @@ spec:
                   type: string
                   description: Name of the database to use for persistence
                   default: sonataflow
+                quayConfig:
+                  title: Choose a prefered Quay configuration
+                  properties:
+                    type: string
+                    default: "Use Existing Repository"
+                    enum:
+                      - "Use Existing Repository"
+                      - "Create New Repository"
+                      - "None"
+              dependencies:
+                quayConfig:
+                  oneOf:
+                    - properties:
+                        quayConfig:
+                          const: "Use Existing Repository"
+                        quayOrgName:
+                          title: Quay Organization Name
+                          type: string
+                          description: The Quay organization name of the published workflow
+                        quayRepoName:
+                          title: Quay Repository Name
+                          type: string
+                          description: The Quay repository name of the published workflow. The repository must exist before deploying the gitops
+                        required:
+                          - quayOrgName
+                          - quayRepoName
+                    - properties:
+                        quayConfig:
+                          const: "Create New Repository"
+                        properties:
+                          quayOrgName:
+                            title: Quay Organization Name
+                            type: string
+                            description: The Quay Organization Name of the published workflow
+                          quayRepoName:
+                            title: Quay Repository Name
+                            type: string
+                            description: A name to create a new Quay Repository of the published workflow
+                          token:
+                            title: Quay AuthToken
+                            type: string
+                            description: Quay rganization bearer token used for authorization
+                            ui:widget: password
+                          visibility:
+                            title: Quay Repository Visiblity
+                            type: string
+                            description: Visibility setting for the created repository, either public or private
+                            ui:widget: select
+                            enum: ["public", "private"]
+                            default: public
+                          repoKind:
+                            title: Quay Repository Kind
+                            type: string
+                            description: The created Quay repository kind, either image or application
+                            ui:widget: select
+                            enum: ["image", "application"]
+                            default: image
+                          newRepoDescription:
+                            title: Quay Repository Description
+                            type: string
+                            description: The Quay repository description
+                          baseUrl:
+                            title: Quay Base URL
+                            type: string
+                            description: URL of your Quay instance
+                            default: "https://quay.io"
+                          quayNamespace:
+                            title: Quay Namespace
+                            type: string
+                            description: The Quay namespace of the published workflow
+                        required:
+                          - visibility
+                          - newRepoDescription
+                          - quayNamespace
+                          - token
+                          - quayOrgName
+                          - quayRepoName
               required:
                 - namespace
                 - argocdNamespace
@@ -193,73 +261,7 @@ spec:
                 - persistencePSQLServicePort
                 - persistencePSQLDatabaseName
                 - quayConfig
-        quayConfig:
-          oneOf:
-            - properties:
-                quayConfig:
-                  const: "Use Existing Repository"
-                quayOrgName:
-                  title: Quay Organization Name
-                  type: string
-                  description: The Quay organization name of the published workflow
-                quayRepoName:
-                  title: Quay Repository Name
-                  type: string
-                  description: The Quay repository name of the published workflow. The repository must exist before deploying the gitops
-                required:
-                  - quayOrgName
-                  - quayRepoName
-            - properties:
-                quayConfig:
-                  const: "Create New Repository"
-                properties:
-                  quayOrgName:
-                    title: Quay Organization Name
-                    type: string
-                    description: The Quay Organization Name of the published workflow
-                  quayRepoName:
-                    title: Quay Repository Name
-                    type: string
-                    description: A name to create a new Quay Repository of the published workflow
-                  token:
-                    title: Quay AuthToken
-                    type: string
-                    description: Quay rganization bearer token used for authorization
-                    ui:widget: password
-                  visibility:
-                    title: Quay Repository Visiblity
-                    type: string
-                    description: Visibility setting for the created repository, either public or private
-                    ui:widget: select
-                    enum: ["public", "private"]
-                    default: public
-                  repoKind:
-                    title: Quay Repository Kind
-                    type: string
-                    description: The created Quay repository kind, either image or application
-                    ui:widget: select
-                    enum: ["image", "application"]
-                    default: image
-                  newRepoDescription:
-                    title: Quay Repository Description
-                    type: string
-                    description: The Quay repository description
-                  baseUrl:
-                    title: Quay Base URL
-                    type: string
-                    description: URL of your Quay instance
-                    default: "https://quay.io"
-                  quayNamespace:
-                    title: Quay Namespace
-                    type: string
-                    description: The Quay namespace of the published workflow
-                required:
-                  - visibility
-                  - newRepoDescription
-                  - quayNamespace
-                  - token
-                  - quayOrgName
-                  - quayRepoName
+
   steps:
     - id: createQuayRepository
       name: Create Quay Repository
