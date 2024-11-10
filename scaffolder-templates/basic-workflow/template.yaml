@@ -173,14 +173,19 @@ spec:
                   type: string
                   description: Name of the database to use for persistence
                   default: sonataflow
+                placeholder:
+                  title:
+                  type: string
+                  ui:disabled: true
                 quayConfig:
                   title: Quay Configuration
                   description: Choose between creating a new Quay repository or using an existing one.
-                  type: string
+                  type: boolean
                   default: "Use Existing Repository"
                   enum:
                     - "Use Existing Repository"
                     - "Create New Repository"
+                  ui:widget: radio
               dependencies:
                 quayConfig:
                   oneOf:
