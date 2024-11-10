@@ -173,6 +173,15 @@ spec:
                   type: string
                   description: Name of the database to use for persistence
                   default: sonataflow
+                quayConfig:
+                  title: Choose a prefered Quay configuration
+                  properties:
+                    type: string
+                    default: "Use Existing Repository"
+                    enum:
+                      - "Use Existing Repository"
+                      - "Create New Repository"
+                      - "None"
               required:
                 - namespace
                 - argocdNamespace
@@ -183,48 +192,26 @@ spec:
                 - persistencePSQLServiceNamespace
                 - persistencePSQLServicePort
                 - persistencePSQLDatabaseName
-    - title: Quay Configuration
-      properties:
+                - quayConfig
         quayConfig:
-          title: Create a new Quay repository or use an existing one?
-          type: string
-          default: "Use Existing Repository"
-          enum:
-            - "Use Existing Repository"
-            - "Create New Repository"
-      dependencies:
-        quayConfig:
-          allOf:
-            - if:
-                properties:
-                  CI:
-                    const: "tekton_argocd"
-                  quayConfig:
-                    const: "Use Existing Repository"
-                    ui:options:
-                      hidden: false
-              then:
-                properties:
-                  quayOrgName:
-                    title: Quay Organization Name
-                    type: string
-                    description: The Quay organization name of the published workflow
-                  quayRepoName:
-                    title: Quay Repository Name
-                    type: string
-                    description: The Quay repository name of the published workflow. The repository must exist before deploying the gitops
+          oneOf:
+            - properties:
+                quayConfig:
+                  const: "Use Existing Repository"
+                quayOrgName:
+                  title: Quay Organization Name
+                  type: string
+                  description: The Quay organization name of the published workflow
+                quayRepoName:
+                  title: Quay Repository Name
+                  type: string
+                  description: The Quay repository name of the published workflow. The repository must exist before deploying the gitops
                 required:
                   - quayOrgName
                   - quayRepoName
-            - if:
-                properties:
-                  CI:
-                    const: "tekton_argocd"
-                  quayConfig:
-                    const: "Create New Repository"
-                    ui:options:
-                      hidden: false
-              then:
+            - properties:
+                quayConfig:
+                  const: "Create New Repository"
                 properties:
                   quayOrgName:
                     title: Quay Organization Name
@@ -273,16 +260,6 @@ spec:
                   - token
                   - quayOrgName
                   - quayRepoName
-            - if:
-                properties:
-                  CI:
-                    const: "none"
-              then:
-                properties:
-                  quayConfig:
-                    const: "Use Existing Repository"
-                    ui:options:
-                      hidden: true
   steps:
     - id: createQuayRepository
       name: Create Quay Repository
