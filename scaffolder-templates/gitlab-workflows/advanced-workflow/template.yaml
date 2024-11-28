@@ -1,8 +1,8 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: advanced-workflow-bootstrap
-  title: Advanced workflow bootstrap project
+  name: gitlab-advanced-workflow-bootstrap
+  title: Gitlab Advanced workflow bootstrap project
   description: Bootstrap project for an advanced assessment serverless workflow using custom java code
   tags:
     - orchestrator

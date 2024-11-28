@@ -1,8 +1,8 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: gitlab-workflow-bootstrap
-  title: Gitlab workflow bootstrap project
+  name: gitlab-basic-workflow-bootstrap
+  title: Gitlab Basic workflow bootstrap project
   description: Bootstrap project for basic serverless workflow with gitlab
   tags:
     - orchestrator
