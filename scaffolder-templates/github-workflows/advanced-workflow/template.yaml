@@ -359,6 +359,7 @@ spec:
           persistencePSQLDatabaseSchema: ${{ parameters.workflowId }}
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
+          gitHost: github.com
         targetPath: gitops
     - id: renameFilesForPersistence
       if: ${{ parameters.CI == 'tekton_argocd' }}

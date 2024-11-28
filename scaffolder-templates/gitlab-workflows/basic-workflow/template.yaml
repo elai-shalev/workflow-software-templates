@@ -37,7 +37,7 @@ spec:
           ui:autofocus: true
           description: Gitlab Group Name
         repoName:
-          title: Repository Name
+          title: Project Name
           type: string
           description: Gitlab Project name
           default: onboarding
@@ -423,6 +423,7 @@ spec:
           persistencePSQLDatabaseSchema: ${{ parameters.workflowId }}
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
+          gitHost: ${{ parameters.gitlabHost }}
         targetPath: gitops
     - id: renameFilesForPersistence
       if: ${{ parameters.CI == 'tekton_argocd' }}
