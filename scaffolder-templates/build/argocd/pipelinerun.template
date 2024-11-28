@@ -47,4 +47,4 @@ spec:
         secretName: docker-credentials
     - name: ssh-creds
       secret:
-        secretName: {{ "gitlab-ssh-credentials" if params.gitHost else "github-ssh-credentials" }}
+        secretName: {{ "gitlab-ssh-credentials" if ${{ values.gitHost }} else "github-ssh-credentials" }}
