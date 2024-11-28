@@ -45,8 +45,8 @@ spec:
         secretName: docker-credentials
     - name: ssh-creds
       secret:
-          {% if values.gitURL and values.gitURL.indexOf('gitlab') != -1 %}
-          secretName: gitlab-ssh-credentials
-          {% else %}
-          secretName: github-ssh-credentials
-          { % endif %}
+        {% if values.gitURL and values.gitURL.indexOf('gitlab') != -1 %}
+        secretName: gitlab-ssh-credentials
+        {% else %}
+        secretName: github-ssh-credentials
+        {% endif %}
