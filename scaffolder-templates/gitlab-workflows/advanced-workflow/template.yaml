@@ -306,7 +306,7 @@ spec:
       action: fetch:template
       if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
-        url: ../.gitlab-ci.yml
+        url: ../build/
         copyWithoutTemplating:
           - .gitlab-ci.yml
         values:
