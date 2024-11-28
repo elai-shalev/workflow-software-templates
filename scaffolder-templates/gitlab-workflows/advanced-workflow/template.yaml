@@ -301,13 +301,13 @@ spec:
           convertToFlat: false
         targetPath: workflow
     - id: addCIPipeline
-      name: Adding the github pipeline for the Workflow
+      name: Adding the gitlab pipeline for the Workflow
       action: fetch:template
       if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
-        url: ../.github/workflows/
+        url: ./
         copyWithoutTemplating:
-          - .github/workflows/update_pipelinerun.yaml
+          - .gitlab-ci.yml
         values:
           namespace: ${{ parameters.namespace }}
           argocdNamespace: ${{ parameters.argocdNamespace }}

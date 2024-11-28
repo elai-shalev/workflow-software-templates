@@ -337,7 +337,7 @@ spec:
           convertToFlat: true
         targetPath: workflow
     - id: addCIPipeline
-      name: Adding the CI for the Workflow
+      name: Adding the gitlab pipeline the Workflow
       action: fetch:template
       if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
