@@ -15,7 +15,7 @@ cd ${{ values.repoName }}/bootstrap
 # Optionally, if edited the file manually, run the following command. 
 {% if values.gitURL and values.gitURL.indexOf('gitlab') != -1 %}
 SSH_PRIVATE_KEY=$(oc get secrets -n orchestrator-gitops gitlab-ssh-credentials -o jsonpath='{.data.id_rsa}') 
-{% else % }
+{% else %}
 SSH_PRIVATE_KEY=$(oc get secrets -n orchestrator-gitops github-ssh-credentials -o jsonpath='{.data.id_rsa}') 
 {% endif %}
 

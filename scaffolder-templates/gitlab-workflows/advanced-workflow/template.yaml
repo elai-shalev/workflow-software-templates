@@ -390,7 +390,6 @@ spec:
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
           gitHost: ${{ parameters.gitlabHost }}
-
         targetPath: gitops
     - id: renameFilesForPersistence
       if: ${{ parameters.CI == 'tekton_argocd' }}
