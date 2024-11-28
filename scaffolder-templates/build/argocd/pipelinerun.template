@@ -47,6 +47,6 @@ spec:
       secret:
           {% if values.gitURL and values.gitURL.indexOf('gitlab') != -1 %}
           secretName: gitlab-ssh-credentials
-          {% else }
+          {% else %}
           secretName: github-ssh-credentials
           { % endif %}
