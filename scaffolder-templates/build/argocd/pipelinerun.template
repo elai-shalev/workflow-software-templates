@@ -21,6 +21,8 @@ spec:
       value: ${{ values.quayOrgName }}
     - name: quayRepoName
       value: ${{ values.quayRepoName }}
+    - name: gitHost
+      value: ${{ values.gitHost }}
   pipelineRef:
     name: workflow-deployment
   workspaces:
@@ -45,8 +47,4 @@ spec:
         secretName: docker-credentials
     - name: ssh-creds
       secret:
-        {% if values.gitURL and values.gitURL.indexOf('gitlab') != -1 %}
-        secretName: gitlab-ssh-credentials
-        {% else %}
-        secretName: github-ssh-credentials
-        {% endif %}
+        secretName: {{ "gitlab-ssh-credentials" if params.gitHost else "github-ssh-credentials" }}

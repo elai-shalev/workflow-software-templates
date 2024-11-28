@@ -298,6 +298,7 @@ spec:
           gitOpsUrl: git@github.com:${{ parameters.orgName }}/${{ parameters.repoName }}-gitops.git
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
+          gitHost: ${{ parameters.gitlabHost }}
           convertToFlat: false
         targetPath: workflow
     - id: addCIPipeline
