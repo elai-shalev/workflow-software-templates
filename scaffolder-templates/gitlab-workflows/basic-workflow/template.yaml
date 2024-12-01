@@ -335,6 +335,7 @@ spec:
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
           convertToFlat: true
+          gitHost: ${{ parameters.gitlabHost }}
         targetPath: workflow
     - id: addCIPipeline
       name: Adding the gitlab pipeline the Workflow

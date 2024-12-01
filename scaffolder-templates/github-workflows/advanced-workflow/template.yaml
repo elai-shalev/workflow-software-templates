@@ -294,6 +294,7 @@ spec:
           quayOrgName: ${{ parameters.quayOrgName }}
           quayRepoName: ${{ parameters.quayRepoName }}
           convertToFlat: false
+          gitHost: github.com
         targetPath: workflow
     - id: addCIPipeline
       name: Adding the github pipeline for the Workflow
