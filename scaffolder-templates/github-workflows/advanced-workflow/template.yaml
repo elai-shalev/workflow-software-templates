@@ -297,11 +297,11 @@ spec:
           gitHost: github.com
         targetPath: workflow
     - id: addCIPipeline
-      name: Adding the github pipeline for the Workflow
+      name: Adding the github pipelinerun
       action: fetch:template
       if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
-        url: ../.github/workflows/
+        url: ../.github/
         copyWithoutTemplating:
           - .github/workflows/update_pipelinerun.yaml
         values:
