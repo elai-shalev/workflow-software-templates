@@ -301,9 +301,9 @@ spec:
       action: fetch:template
       if: ${{ parameters.CI == 'tekton_argocd' }}
       input:
-        url: ../.github/
+        url: ../build
         copyWithoutTemplating:
-          - .github/workflows/update_pipelinerun.yaml
+          - build/.github/workflows/update_pipelinerun.yaml
         values:
           namespace: ${{ parameters.namespace }}
           argocdNamespace: ${{ parameters.argocdNamespace }}
