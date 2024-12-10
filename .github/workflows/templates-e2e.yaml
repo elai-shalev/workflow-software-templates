@@ -1,9 +1,8 @@
 name: Software templates end to end tests 
 
 on:
-    pull_request:
-        branches:
-            - main
+  push
+
 
 jobs:
   run-e2e:
@@ -27,11 +26,6 @@ jobs:
           kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
           kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
 
-    - name: Deploy Tekton
-      run: |
-          kubectl apply -n tekton-pipelines --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
-          kubectl get pods --namespace tekton-pipelines
-
     - name: Deploy Orchestrator 
       run: |
           helm repo add orchestrator https://parodos-dev.github.io/orchestrator-helm-chart
@@ -44,14 +38,27 @@ jobs:
 
     - name: Gather Secrets
       run: |
-        echo "BACKEND_TOKEN=$(kubectl get secrets -n default orchestrator-auth -o json | jq -r '.data | to_entries[] | "\(.key): \(.value | @base64d)"' | awk '{print $2}')" >> $GITHUB_ENV
-        echo "BACKSTAGE_URL=http://localhost:9090" >> $GITHUB_ENV
-        echo "PSQL_SECRET=$(kubectl get secrets -n default orchestrator-postgresql -o json | jq -r '.data | to_entries[] | "\(.key): \(.value | @base64d)"' | awk '{print $2}')" >> $GITHUB_ENV
-        # VALIDATE L49
+        echo "Proxy Janus-idp port ⏳"
+        kubectl port-forward "$(kubectl get svc -l app.kubernetes.io/name=backstage -o name)" 9080:7007 &
+        port_forward_pid="$!"
+        sleep 3
+        echo "Proxy Janus-idp port ✅"
+        
+        BACKEND_TOKEN=$(kubectl get secret -n default orchestrator-auth -o json | jq -r '.data | to_entries[] | "\(.key): \(.value | @base64d )"' | awk '{print $2}')
+        echo HEY
+        echo "BACKEND_TOKEN=$BACKEND_TOKEN" 
+        echo HEYY
+        echo "BACKEND_TOKEN=$BACKEND_TOKEN" >> $GITHUB_ENV
+        echo HEYYY
+        echo "BACKSTAGE_URL=http://localhost:9080" >> $GITHUB_ENV
+        echo HEYYYY
+        PSQL_SECRET=$(kubectl get secret -n default orchestrator-postgresql -o json | jq -r '.data | to_entries[] | "\(.key): \(.value | @base64d )"' | awk '{print $2}' | tail -1)
+        echo "PSQL_SECRET=$PSQL_SECRET" >> $GITHUB_ENV
+        
         
     - name: Run Advanced Template
       run: | 
-        TASK_ID=$(curl -X POST "http://localhost:9090/api/scaffolder/v2/tasks" \
+        TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" \
         -H "Authorization: Bearer $BEARER" \
         -H "Content-Type: application/json" \
         -d '{
@@ -68,29 +75,30 @@ jobs:
             "infrastructureWorkflowId": "test",
             "namespace": "sonataflow-operator-system", 
             "persistencePSQLDatabaseName": "sonataflow",
-            "persistencePSQLPasswordKey": "postgres-password",
+            "persistencePSQLPasswordKey": "$PSQL_SECRET",
             "persistencePSQLSecretName": "sonataflow-psql-postgresql",
             "persistencePSQLServiceName": "orchestrator-postgresql",
-            "persistencePSQLServiceNamespace": "sonataflow-infra",
+            "persistencePSQLServiceNamespace": "default",
             "persistencePSQLServicePort": 5432,
-            "persistencePSQLUserKey": "default",
+            "persistencePSQLUserKey": "$PSQL_SECRET",
             "quayConfig": "Use Existing Repository",
             "quayOrgName": "testing-eshalev",
             "quayRepoName": "cray",
             "system": "Guest"
           }
         }' | jq .id)
-        echo $TASK_ID >> $GITHUB_ENV
+        echo "TASK ID is $TASK_ID"
+        echo "TASK_ID=$TASK_ID" >> $GITHUB_ENV
     
     - name: Validate Advanced Template Successs
       run: | 
         sleep 45
-        curl -X GET "http://localhost:9090/api/scaffolder/v2/tasks/$TASK_ID" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status
+        curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$TASK_ID" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status
 
 
     - name: Run Basic Template
       run: | 
-        TASK_ID=$(curl -X POST "http://localhost:9090/api/scaffolder/v2/tasks" \
+        TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" \
         -H "Authorization: Bearer $BEARER" \
         -H "Content-Type: application/json" \
         -d '{
@@ -119,12 +127,12 @@ jobs:
             "system": "v"
           }
         }' | jq .id)
-        echo $TASK_ID >> $GITHUB_ENV
+        echo "TASK_ID=$TASK_ID" >> $GITHUB_ENV
     
     - name: Validate Basic Template Successs
       run: | 
         sleep 45
-        RESULT=$(curl -X GET "http://localhost:9090/api/scaffolder/v2/tasks/$TASK_ID" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status)
+        RESULT=$(curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$TASK_ID" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status)
         if [ "$RESULT" = "Error" ]; then 
           exit 1
         fi 
