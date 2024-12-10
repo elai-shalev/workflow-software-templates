@@ -58,7 +58,7 @@ jobs:
         
     - name: Run Advanced Template
       run: | 
-        TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BEARER" -H "Content-Type: application/json" -d '{"templateRef":"template:default/advanced-workflow-bootstrap","createdBy":"user:guest","values":{"owner":"user:guest","orgName":"test-workflows","repoName":"test-repo","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"cray","system":"Guest"}}' | jq .id)
+        curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/advanced-workflow-bootstrap","createdBy":"user:guest","values":{"owner":"user:guest","orgName":"test-workflows","repoName":"test-repo","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"cray","system":"Guest"}}'
 
         echo "TASK ID is $TASK_ID"
         echo "TASK_ID=$TASK_ID" >> $GITHUB_ENV
@@ -71,36 +71,8 @@ jobs:
 
     - name: Run Basic Template
       run: | 
-        TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" \
-        -H "Authorization: Bearer $BEARER" \
-        -H "Content-Type: application/json" \
-        -d '{
-          "templateRef": "template:default/basic-workflow-bootstrap",
-          "createdBy": "user:guest",
-          "values": {
-            "owner": "user:guest",
-            "orgName": "v",
-            "repoName": "v",
-            "description": "v",
-            "workflowId": "v",
-            "CI": "tekton_argocd",
-            "argocdNamespace": "orchestrator-gitops",
-            "infrastructureWorkflowId": "v",
-            "namespace": "sonataflow-infra",
-            "persistencePSQLDatabaseName": "sonataflow",
-            "persistencePSQLPasswordKey": "postgres-password",
-            "persistencePSQLSecretName": "sonataflow-psql-postgresql",
-            "persistencePSQLServiceName": "sonataflow-psql-postgresql",
-            "persistencePSQLServiceNamespace": "sonataflow-infra",
-            "persistencePSQLServicePort": 5432,
-            "persistencePSQLUserKey": "postgres-username",
-            "quayConfig": "Use Existing Repository",
-            "quayOrgName": "v",
-            "quayRepoName": "v",
-            "system": "v"
-          }
-        }' | jq .id)
-        echo "TASK_ID=$TASK_ID" >> $GITHUB_ENV
+        # curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/advanced-workflow-bootstrap","createdBy":"user:guest","values":{"owner":"user:guest","orgName":"test-workflows","repoName":"test-repo","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"cray","system":"Guest"}}'
+        # echo "TASK_ID=$TASK_ID" >> $GITHUB_ENV
     
     - name: Validate Basic Template Successs
       run: | 
