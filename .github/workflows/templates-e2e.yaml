@@ -45,13 +45,8 @@ jobs:
         echo "Proxy Janus-idp port ✅"
         
         BACKEND_TOKEN=$(kubectl get secret -n default orchestrator-auth -o json | jq -r '.data | to_entries[] | "\(.key): \(.value | @base64d )"' | awk '{print $2}')
-        echo HEY
-        echo "BACKEND_TOKEN=$BACKEND_TOKEN" 
-        echo HEYY
         echo "BACKEND_TOKEN=$BACKEND_TOKEN" >> $GITHUB_ENV
-        echo HEYYY
         echo "BACKSTAGE_URL=http://localhost:9080" >> $GITHUB_ENV
-        echo HEYYYY
         PSQL_SECRET=$(kubectl get secret -n default orchestrator-postgresql -o json | jq -r '.data | to_entries[] | "\(.key): \(.value | @base64d )"' | awk '{print $2}' | tail -1)
         echo "PSQL_SECRET=$PSQL_SECRET" >> $GITHUB_ENV
         
@@ -66,17 +61,23 @@ jobs:
     - name: Validate Basic Template Successs
       run: | 
         sleep 20
-        RESULT=$(curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$TASK_ID" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status)
+        RESULT=$(curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$TASK_ID" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status | tr -d '"')
         if [ "$RESULT" = "failed" ]; then 
+          echo "The Basic template launched but failed to complete."
           exit 1
         fi
-        echo "End to end tests passed ✅"
-    - name: Run Basic Template
+
+        if [ "$RESULT" = "success" ]; then 
+          echo "The Basic template was executed successfully."
+        fi
+
+
+    - name: Run Advanced Template
       run: | 
         # curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/complex-assesment-workflow-bootstrap","createdBy":"user:guest","values":{"owner":"user:guest","orgName":"test-workflows","repoName":"test-repo","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"cray","system":"Guest"}}'
         # echo "TASK_ID=$TASK_ID" >> $GITHUB_ENV
     
-    - name: Validate Basic Template Successs
+    - name: Validate Advanced Template Successs
       run: | 
         # sleep 45
         RESULT=$(curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$TASK_ID" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status)
