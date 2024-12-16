@@ -46,13 +46,6 @@ jobs:
         sleep 3
         echo "Proxy Janus-idp port ✅"
         
-        BACKEND_TOKEN=$(kubectl get secret -n default orchestrator-auth -o jsonpath={.data.backend-secret} | base64 -d)
-        echo "BACKEND_TOKEN=$BACKEND_TOKEN" >> $GITHUB_ENV
-        echo "BACKSTAGE_URL=http://localhost:9080" >> $GITHUB_ENV
-        PSQL_SECRET=$(kubectl get secret -n default orchestrator-postgresql -o jsonpath={.data.password} | base64 -d)
-        echo "PSQL_SECRET=$PSQL_SECRET" >> $GITHUB_ENV
-
-
         kubectl get cm orchestrator-backstage-app-config -n default -oyaml > save.yaml
         cat save.yaml
         #sed '/locations:/a\      - target: https://github.com/rhdhorchestrator/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/basic-workflow/template.yaml\n        type: url\n      - target: https://github.com/rhdhorchestrator/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/advanced-workflow/template.yaml\n        type: url' save.yaml
@@ -67,8 +60,18 @@ jobs:
 
         kubectl get cm orchestrator-backstage-app-config -n default -oyaml 
 
+        BACKEND_TOKEN=$(kubectl get secret -n default orchestrator-auth -o jsonpath={.data.backend-secret} | base64 -d)
+        echo "BACKEND_TOKEN=$BACKEND_TOKEN" >> $GITHUB_ENV
+        echo "BACKSTAGE_URL=http://localhost:9080" >> $GITHUB_ENV
+        PSQL_SECRET=$(kubectl get secret -n default orchestrator-postgresql -o jsonpath={.data.password} | base64 -d)
+        echo "PSQL_SECRET=$PSQL_SECRET" >> $GITHUB_ENV
+
+        set -x
+
         curl -X POST "$BACKSTAGE_URL/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/ElaiShalevRH/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/advanced-workflow/template.yaml"}'
         curl -X POST "$BACKSTAGE_URL/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/ElaiShalevRH/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/basic-workflow/template.yaml"}'
+
+        set +x
 
 
         
