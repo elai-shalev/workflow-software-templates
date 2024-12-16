@@ -66,12 +66,13 @@ jobs:
         sleep 3
         echo "Proxy Janus-idp port ✅"
 
-        set -x
-
+        echo "NOW ADVANCED"
         curl -X POST "http://localhost:9080/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/ElaiShalevRH/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/advanced-workflow/template.yaml"}'
+
+        sleep 2
+        echo "NOW BASIC"
         curl -X POST "http://localhost:9080/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/ElaiShalevRH/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/basic-workflow/template.yaml"}'
 
-        set +x
 
 
         
@@ -86,6 +87,8 @@ jobs:
       run: | 
         sleep 20
         RESULT=$(curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$TASK_ID" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status | tr -d '"')
+        echo "NOW"
+        echo $RESULT
         if [ "$RESULT" = "failed" ]; then 
           echo "The Basic template launched but failed to complete."
           exit 1
@@ -105,9 +108,16 @@ jobs:
       run: | 
         sleep 20
         RESULT=$(curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$TASK_ID" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status)
-        if [ "$RESULT" = "Error" ]; then 
+        echo "NOW"
+        echo $RESULT
+        if [ "$RESULT" = "failed" ]; then 
+          echo "The Basic template launched but failed to complete."
           exit 1
-        fi 
+        fi
+
+        if [ "$RESULT" = "success" ]; then 
+          echo "The Basic template was executed successfully."
+        fi
         
     
     - name: Cleanup
