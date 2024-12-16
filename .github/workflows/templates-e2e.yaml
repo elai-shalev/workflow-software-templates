@@ -54,7 +54,7 @@ jobs:
 
 
 
-        kubectl get cm orchestrator-backstage-app-config -n default - oyaml > save.yaml
+        kubectl get cm orchestrator-backstage-app-config -n default -oyaml > save.yaml
         cat save.yaml
         sed '/locations:/a\      - target: https://github.com/rhdhorchestrator/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/basic-workflow/template.yaml\n        type: url\n      - target: https://github.com/rhdhorchestrator/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/advanced-workflow/template.yaml\n        type: url' save.yaml
         kubectl apply -f save.yaml
