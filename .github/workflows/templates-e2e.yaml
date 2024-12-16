@@ -40,11 +40,6 @@ jobs:
 
     - name: Set config and gather Secrets
       run: |
-        echo "Proxy Janus-idp port ⏳"
-        kubectl port-forward "$(kubectl get svc -l app.kubernetes.io/name=backstage -o name)" 9080:7007 &
-        port_forward_pid="$!"
-        sleep 3
-        echo "Proxy Janus-idp port ✅"
         
         kubectl get cm orchestrator-backstage-app-config -n default -oyaml > save.yaml
         #sed '/locations:/a\      - target: https://github.com/rhdhorchestrator/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/basic-workflow/template.yaml\n        type: url\n      - target: https://github.com/rhdhorchestrator/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/advanced-workflow/template.yaml\n        type: url' save.yaml
@@ -64,6 +59,12 @@ jobs:
         echo "BACKSTAGE_URL=http://localhost:9080" >> $GITHUB_ENV
         PSQL_SECRET=$(kubectl get secret -n default orchestrator-postgresql -o jsonpath={.data.password} | base64 -d)
         echo "PSQL_SECRET=$PSQL_SECRET" >> $GITHUB_ENV
+
+        echo "Proxy Janus-idp port ⏳"
+        kubectl port-forward "$(kubectl get svc -l app.kubernetes.io/name=backstage -o name)" 9080:7007 &
+        port_forward_pid="$!"
+        sleep 3
+        echo "Proxy Janus-idp port ✅"
 
         set -x
 
