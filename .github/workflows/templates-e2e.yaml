@@ -49,7 +49,7 @@ jobs:
         BACKEND_TOKEN=$(kubectl get secret -default orchestrator-auth -o jsonpath={.data.backend-secret} | base64 -d)
         echo "BACKEND_TOKEN=$BACKEND_TOKEN" >> $GITHUB_ENV
         echo "BACKSTAGE_URL=http://localhost:9080" >> $GITHUB_ENV
-        PSQL_SECRET=$(kubectl get secret orchestrator-postgresql -o jsonpath={.data.password} | base64 -d
+        PSQL_SECRET=$(kubectl get secret orchestrator-postgresql -o jsonpath={.data.password} | base64 -d)
         echo "PSQL_SECRET=$PSQL_SECRET" >> $GITHUB_ENV
 
 
