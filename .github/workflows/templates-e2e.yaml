@@ -83,6 +83,10 @@ jobs:
     - name: Validate Advanced Template Successs
       run: | 
         sleep 20
+
+        kubectl logs -n default $(kubectl get pods | awk '{print $1}' | grep orchestrator-backstage)
+
+
         curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$TASK_ID2" -H "Authorization: Bearer $BACKEND_TOKEN" 
         echo "NOW"
         echo $RESULT
