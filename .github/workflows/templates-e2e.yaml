@@ -43,7 +43,7 @@ jobs:
         
         kubectl get cm orchestrator-backstage-app-config -n default -oyaml > save.yaml
         #sed '/locations:/a\      - target: https://github.com/rhdhorchestrator/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/basic-workflow/template.yaml\n        type: url\n      - target: https://github.com/rhdhorchestrator/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/advanced-workflow/template.yaml\n        type: url' save.yaml
-        sed -i "s/INSERT VALID TOKEN HERE/${{ secrets.GITHUB_TOKEN }}/g" save.yaml
+        sed -i "s/INSERT VALID TOKEN HERE/$GITHUB_TOKEN/g" save.yaml
         kubectl apply -f save.yaml
         kubectl rollout restart deployment orchestrator-backstage -n default
 
@@ -77,13 +77,13 @@ jobs:
 
     - name: Run Advanced Template
       run: | 
-        TASK_ID2=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/advanced-workflow-bootstrap","values":{"owner":"user:guest","orgName":"test-workflows","repoName":"test-repo","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"cray","system":"Guest"}}' | jq .id | tr -d '"')
+        TASK_ID2=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/advanced-workflow-bootstrap","values":{"owner":"user:guest","orgName":"ElaiShalevRH","repoName":"neukollen","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"cray","system":"Guest"}}' | jq .id | tr -d '"')
         echo "TASK_ID2=$TASK_ID2" >> $GITHUB_ENV
     
     - name: Validate Advanced Template Successs
       run: | 
         sleep 20
-        RESULT=$(curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$TASK_ID2" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status)
+        curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$TASK_ID2" -H "Authorization: Bearer $BACKEND_TOKEN" 
         echo "NOW"
         echo $RESULT
         if [ "$RESULT" = "failed" ]; then 
