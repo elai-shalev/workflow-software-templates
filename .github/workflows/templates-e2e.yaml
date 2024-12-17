@@ -7,7 +7,7 @@ on:
 jobs:
   run-e2e:
     env: 
-      GITHUB_TOKEN: ${{ github.TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.TOKEN }}
     runs-on: ubuntu-24.04
     steps:
     - name: Create k8s Kind Cluster
