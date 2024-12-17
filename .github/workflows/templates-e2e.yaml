@@ -95,34 +95,38 @@ jobs:
         # curl -X POST "http://localhost:9080/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/$GITHUB_ORG/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/basic-workflow/template.yaml"}'
 
     - name: Run Advanced Template
-      run: | 
-        cat > advanced_payload.json <<EOF
-        {
-          "templateRef": "template:default/advanced-workflow-bootstrap",
-          "values": {
-            "owner": "user:guest",
-            "orgName": "$GITHUB_ORG",
-            "repoName": "advanced-template-test",
-            "description": "This is a test repository for a workflow created by a template",
-            "workflowId": "test",
-            "CI": "tekton_argocd",
-            "argocdNamespace": "argocd",
-            "infrastructureWorkflowId": "test",
-            "namespace": "sonataflow-operator-system",
-            "persistencePSQLDatabaseName": "sonataflow",
-            "persistencePSQLPasswordKey": "$PSQL_SECRET",
-            "persistencePSQLSecretName": "sonataflow-psql-postgresql",
-            "persistencePSQLServiceName": "orchestrator-postgresql",
-            "persistencePSQLServiceNamespace": "default",
-            "persistencePSQLServicePort": 5432,
-            "persistencePSQLUserKey": "$PSQL_SECRET",
-            "quayConfig": "Use Existing Repository",
-            "quayOrgName": "$QUAY_ORG",
-            "quayRepoName": "test",
-            "system": "Guest"
-          }
-        }
-        EOF
+      run: |
+        jq -n \
+          --arg org "$GITHUB_ORG" \
+          --arg repo "advanced-template-test" \
+          --arg description "This is a test repository for a workflow created by a template" \
+          --arg quayOrg "$QUAY_ORG" \
+          --arg psqlSecret "$PSQL_SECRET" \
+          '{
+            "templateRef": "template:default/advanced-workflow-bootstrap",
+            "values": {
+              "owner": "user:guest",
+              "orgName": $org,
+              "repoName": $repo,
+              "description": $description,
+              "workflowId": "test",
+              "CI": "tekton_argocd",
+              "argocdNamespace": "argocd",
+              "infrastructureWorkflowId": "test",
+              "namespace": "sonataflow-operator-system",
+              "persistencePSQLDatabaseName": "sonataflow",
+              "persistencePSQLPasswordKey": $psqlSecret,
+              "persistencePSQLSecretName": "sonataflow-psql-postgresql",
+              "persistencePSQLServiceName": "orchestrator-postgresql",
+              "persistencePSQLServiceNamespace": "default",
+              "persistencePSQLServicePort": 5432,
+              "persistencePSQLUserKey": $psqlSecret,
+              "quayConfig": "Use Existing Repository",
+              "quayOrgName": $quayOrg,
+              "quayRepoName": "test",
+              "system": "Guest"
+            }
+          }' > advanced_payload.json
 
         ADVANCED_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" --data-binary @advanced_payload.json | jq .id | tr -d '"')
 
@@ -146,34 +150,36 @@ jobs:
         
     - name: Run Basic Template
       run: |
-        cat > basic_payload.json <<EOF
-        {
-          "templateRef": "template:default/basic-workflow-bootstrap",
-          "values": {
-            "owner": "user:guest",
-            "orgName": "$GITHUB_ORG",
-            "repoName": "basic-repo-test",
-            "description": "This is a test repository for a workflow created by a template",
-            "workflowId": "basic-repo-test",
-            "CI": "tekton_argocd",
-            "argocdNamespace": "argocd",
-            "infrastructureWorkflowId": "basic-template-test",
-            "namespace": "sonataflow-operator-system",
-            "persistencePSQLDatabaseName": "sonataflow",
-            "persistencePSQLPasswordKey": "$PSQL_SECRET",
-            "persistencePSQLSecretName": "sonataflow-psql-postgresql",
-            "persistencePSQLServiceName": "orchestrator-postgresql",
-            "persistencePSQLServiceNamespace": "default",
-            "persistencePSQLServicePort": 5432,
-            "persistencePSQLUserKey": "$PSQL_SECRET",
-            "workflowType": "infrastructure",
-            "quayConfig": "Use Existing Repository",
-            "quayOrgName": "$QUAY_ORG",
-            "quayRepoName": "test",
-            "system": "Guest"
-          }
-        }
-        EOF
+        jq -n \
+            --arg org "$GITHUB_ORG" \
+            --arg psqlSecret "$PSQL_SECRET" \
+            --arg quayOrg "$QUAY_ORG" \
+            '{
+              "templateRef": "template:default/basic-workflow-bootstrap",
+              "values": {
+                "owner": "user:guest",
+                "orgName": $org,
+                "repoName": "basic-repo-test",
+                "description": "This is a test repository for a workflow created by a template",
+                "workflowId": "basic-repo-test",
+                "CI": "tekton_argocd",
+                "argocdNamespace": "argocd",
+                "infrastructureWorkflowId": "basic-template-test",
+                "namespace": "sonataflow-operator-system",
+                "persistencePSQLDatabaseName": "sonataflow",
+                "persistencePSQLPasswordKey": $psqlSecret,
+                "persistencePSQLSecretName": "sonataflow-psql-postgresql",
+                "persistencePSQLServiceName": "orchestrator-postgresql",
+                "persistencePSQLServiceNamespace": "default",
+                "persistencePSQLServicePort": 5432,
+                "persistencePSQLUserKey": $psqlSecret,
+                "workflowType": "infrastructure",
+                "quayConfig": "Use Existing Repository",
+                "quayOrgName": $quayOrg,
+                "quayRepoName": "test",
+                "system": "Guest"
+              }
+            }' > basic_payload.json
   
         BASIC_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" \
         -H "Authorization: Bearer $BACKEND_TOKEN" \
