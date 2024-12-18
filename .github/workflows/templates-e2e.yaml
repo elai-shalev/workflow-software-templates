@@ -33,7 +33,7 @@ jobs:
     - name: Deploy Orchestrator 
       run: |
           helm repo add orchestrator https://rhdhorchestrator.github.io/orchestrator-helm-chart
-          helm install --version 0.3.14 orchestrator orchestrator/orchestrator-k8s --set platform.eventing.broker.name="" 
+          helm install orchestrator orchestrator/orchestrator-k8s --set platform.eventing.broker.name="" 
 
           kubectl get sfp -A
           kubectl wait --for=condition=Ready=true pods -l "app.kubernetes.io/name=backstage" --timeout=10m
@@ -72,6 +72,13 @@ jobs:
 
         kubectl get cm backstage-locations -oyaml
         kubectl get cm orchestrator-backstage-app-config -oyaml 
+
+    - name: Export kind Logs
+      run: |
+          kubectl get pod -A
+          kubectl get deploy -A
+          kubectl get sonataflow -A
+          kind export logs ./kind_logs
 
 
     - name: Run Advanced Template
