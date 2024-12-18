@@ -1,13 +1,14 @@
-name: Software templates end to end tests 
+name: Workflow Software Templates End to End CI 
 
 on:
-  push
-
+  pull_request_target:
+    branches:
+      - main
 jobs:
   run-e2e:
     env: 
-      GITHUB_TOKEN:  ${{ secrets.TOKEN }}
-      GITHUB_ORG: ElaiShalevRH
+      GITHUB_TOKEN:  ${{ secrets.GH_TOKEN }}
+      GITHUB_ORG: rhdhorchestrator
     runs-on: ubuntu-24.04
     steps:
     - name: Create k8s Kind Cluster
