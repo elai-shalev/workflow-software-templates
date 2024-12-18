@@ -38,11 +38,9 @@ jobs:
           kubectl get pods -o wide
           kubectl wait --for=condition=Ready=true pods -l "app=sonataflow-platform" --timeout=180s
 
-    - name: Set config and gather Secrets
+    - name: Set Configuration and Secrets
       run: |
-        
         kubectl get cm orchestrator-backstage-app-config -n default -oyaml > save.yaml
-        #sed '/locations:/a\      - target: https://github.com/rhdhorchestrator/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/basic-workflow/template.yaml\n        type: url\n      - target: https://github.com/rhdhorchestrator/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/advanced-workflow/template.yaml\n        type: url' save.yaml
         sed -i "s/INSERT VALID TOKEN HERE/$GITHUB_TOKEN/g" save.yaml
         kubectl apply -f save.yaml
         kubectl rollout restart deployment orchestrator-backstage -n default
@@ -51,8 +49,6 @@ jobs:
         kubectl wait --for=condition=Ready=true pods -l "app.kubernetes.io/name=backstage" --timeout=10m
         kubectl get pods -o wide
         kubectl wait --for=condition=Ready=true pods -l "app=sonataflow-platform" --timeout=180s
-
-        kubectl get cm orchestrator-backstage-app-config -n default -oyaml 
 
         BACKEND_TOKEN=$(kubectl get secret -n default orchestrator-auth -o jsonpath={.data.backend-secret} | base64 -d)
         echo "BACKEND_TOKEN=$BACKEND_TOKEN" >> $GITHUB_ENV
@@ -66,18 +62,18 @@ jobs:
         sleep 3
         echo "Proxy Janus-idp port ✅"
 
-        echo "NOW ADVANCED"
+    - name: Register Software Templates
+      run: | 
+        echo "Registering Advanced Template"
         curl -X POST "http://localhost:9080/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/ElaiShalevRH/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/advanced-workflow/template.yaml"}' | jq
-
         sleep 2
-
-        echo "NOW BASIC"
+        echo "Registering Basic Template"
         curl -X POST "http://localhost:9080/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/ElaiShalevRH/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/basic-workflow/template.yaml"}' | jq
 
-
-    - name: Run Advanced Template
+    - name: Launch Advanced Template
       run: | 
-        ADVANCED_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/advanced-workflow-bootstrap","values":{"owner":"user:guest","orgName":"ElaiShalevRH","repoName":"axmas","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"cray","system":"Guest"}}' | jq .id | tr -d '"')
+        echo "Launch Advanced Template"
+        ADVANCED_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/advanced-workflow-bootstrap","values":{"owner":"user:guest","orgName":"ElaiShalevRH","repoName":"advanced","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"cray","system":"Guest"}}' | jq .id | tr -d '"')
         echo "ADVANCED_TASK_ID is $ADVANCED_TASK_ID"
         echo "ADVANCED_TASK_ID=$ADVANCED_TASK_ID" >> $GITHUB_ENV
     
@@ -95,11 +91,10 @@ jobs:
           echo "The Advanced template was executed successfully."
         fi
         
-        
-    - name: Run Basic Template
+    - name: Launch Basic Template
       run: | 
-        BASIC_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/basic-workflow-bootstrap","values":{"owner":"user:guest","orgName":"ElaiShalevRH","repoName":"bxmas","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","workflowType":"infrastructure", "quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"cray","system":"Guest"}}' | jq .id | tr -d '"')
-        
+        echo "Launch Basic Template"
+        BASIC_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/basic-workflow-bootstrap","values":{"owner":"user:guest","orgName":"ElaiShalevRH","repoName":"basic","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","workflowType":"infrastructure", "quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"cray","system":"Guest"}}' | jq .id | tr -d '"')
         echo "BASIC_TASK_ID is $BASIC_TASK_ID"
         echo "BASIC_TASK_ID=$BASIC_TASK_ID" >> $GITHUB_ENV
     
@@ -107,7 +102,6 @@ jobs:
       run: | 
         sleep 20
         RESULT=$(curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$BASIC_TASK_ID" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status | tr -d '"')
-        echo "NOW"
         echo $RESULT
         if [ "$RESULT" = "failed" ]; then 
           echo "The Basic template launched but failed to complete."
@@ -134,15 +128,14 @@ jobs:
         name: kind-logs
         path: ./kind_logs/
 
-    
     - name: Cleanup
+      if: always()
       run: |
-        echo "End to end tests passed ✅"
-
-        curl -X DELETE https://api.github.com/repos/$GITHUB_ORG/axmas           -H "Authorization: Bearer $GITHUB_TOKEN"
-        curl -X DELETE https://api.github.com/repos/$GITHUB_ORG/bxmas    -H "Authorization: Bearer $GITHUB_TOKEN"
-        curl -X DELETE https://api.github.com/repos/$GITHUB_ORG/axmas-gitops           -H "Authorization: Bearer $GITHUB_TOKEN"
-        curl -X DELETE https://api.github.com/repos/$GITHUB_ORG/bxmas-gitops -H "Authorization: Bearer $GITHUB_TOKEN"
+        echo "Deleting Created Repositories"
+        curl -X DELETE https://api.github.com/repos/ElaiShalevRH/advanced         -H "Authorization: Bearer $GITHUB_TOKEN"
+        curl -X DELETE https://api.github.com/repos/ElaiShalevRH/basic            -H "Authorization: Bearer $GITHUB_TOKEN"
+        curl -X DELETE https://api.github.com/repos/ElaiShalevRH/advanced-gitops  -H "Authorization: Bearer $GITHUB_TOKEN"
+        curl -X DELETE https://api.github.com/repos/ElaiShalevRH/basic-gitops     -H "Authorization: Bearer $GITHUB_TOKEN"
 
         # Delete RHDH resources created (catalog etc)
 
