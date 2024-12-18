@@ -67,8 +67,8 @@ jobs:
         
     - name: Register Software Templates
       run: |
-        curl -X POST "http://localhost:9080/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/ElaiShalevRH/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/advanced-workflow/template.yaml"}' | jq 
-        curl -X POST "http://localhost:9080/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/ElaiShalevRH/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/basic-workflow/template.yaml"}' | jq 
+        curl -X POST "http://localhost:9080/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/rhdhorchestrator/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/advanced-workflow/template.yaml"}' | jq 
+        curl -X POST "http://localhost:9080/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/rhdhorchestrator/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/basic-workflow/template.yaml"}' | jq 
 
 
     - name: Run Advanced Template
@@ -78,7 +78,7 @@ jobs:
         # kubectl logs -n default $(kubectl get pods | awk '{print $1}' | grep orchestrator-backstage)
         echo "ADVANCED_TASK_ID is $ADVANCED_TASK_ID"
         echo "ADVANCED_TASK_ID=$ADVANCED_TASK_ID" >> $GITHUB_ENV
-        exit 1
+        
     
     - name: Validate Advanced Template Successs
       run: | 
