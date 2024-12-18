@@ -117,6 +117,22 @@ jobs:
           echo "The Basic template was executed successfully. "
         fi
 
+    - name: Export kind Logs
+      if: always()
+      run: |
+          kubectl get pod -A
+          kubectl get deploy -A
+          kubectl get sonataflow -A
+          kind export logs ./kind_logs
+
+    - name: Upload Kind Logs
+      uses: actions/upload-artifact@v4
+      # Always run this, even if one of the previous steps failed.
+      if: always()
+      with:
+        name: kind-logs
+        path: ./kind_logs/
+
     
     - name: Cleanup
       run: |
