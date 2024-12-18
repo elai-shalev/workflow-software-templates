@@ -80,7 +80,6 @@ jobs:
         
         # kubectl logs -n default $(kubectl get pods | awk '{print $1}' | grep orchestrator-backstage)
         # curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/advanced-workflow-bootstrap","values":{"owner":"user:guest","orgName":"ElaiShalevRH","repoName":"neukollen","description":"This is a Test Repository","workflowId":"test","infrastructureWorkflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"test","system":system:default/janus-orchestrator"}}' | jq .id | tr -d '"')
-        exit 1
         echo "ADVANCED_TASK_ID is $ADVANCED_TASK_ID"
         echo "ADVANCED_TASK_ID=$ADVANCED_TASK_ID" >> $GITHUB_ENV
         
