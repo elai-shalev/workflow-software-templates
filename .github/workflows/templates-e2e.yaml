@@ -114,7 +114,7 @@ jobs:
         fi
 
         if [ "$RESULT" = "success" ]; then 
-          echo "The Basic template was executed successfully."
+          echo "The Basic template was executed successfully. "
         fi
 
     
