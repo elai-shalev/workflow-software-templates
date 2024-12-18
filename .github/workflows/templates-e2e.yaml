@@ -3,13 +3,13 @@ name: Software templates end to end tests
 on:
   push
 
-
 jobs:
   run-e2e:
     env: 
       GITHUB_TOKEN:  ${{ secrets.TOKEN }}
+      GITHUB_ORG: ElaiShalevRH
     runs-on: ubuntu-24.04
-    steps:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+    steps:
     - name: Create k8s Kind Cluster
       uses: helm/kind-action@v1.10.0
       with:
@@ -65,15 +65,15 @@ jobs:
     - name: Register Software Templates
       run: | 
         echo "Registering Advanced Template"
-        curl -X POST "http://localhost:9080/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/ElaiShalevRH/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/advanced-workflow/template.yaml"}' | jq
+        curl -X POST "$BACKSTAGE_URL/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/rhdhorchestrator/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/advanced-workflow/template.yaml"}' | jq
         sleep 2
         echo "Registering Basic Template"
-        curl -X POST "http://localhost:9080/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/ElaiShalevRH/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/basic-workflow/template.yaml"}' | jq
+        curl -X POST "$BACKSTAGE_URL/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/rhdhorchestrator/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/basic-workflow/template.yaml"}' | jq
 
     - name: Launch Advanced Template
       run: | 
         echo "Launch Advanced Template"
-        ADVANCED_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/advanced-workflow-bootstrap","values":{"owner":"user:guest","orgName":"ElaiShalevRH","repoName":"advanced","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"cray","system":"Guest"}}' | jq .id | tr -d '"')
+        ADVANCED_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/advanced-workflow-bootstrap","values":{"owner":"user:guest","orgName":"'$GITHUB_ORG'","repoName":"advanced","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"'$PSQL_SECRET'","quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"test","system":"Guest"}}' | jq .id | tr -d '"')
         echo "ADVANCED_TASK_ID is $ADVANCED_TASK_ID"
         echo "ADVANCED_TASK_ID=$ADVANCED_TASK_ID" >> $GITHUB_ENV
     
@@ -92,14 +92,14 @@ jobs:
         fi
         
     - name: Launch Basic Template
-      run: | 
+      run: |
         echo "Launch Basic Template"
-        BASIC_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/basic-workflow-bootstrap","values":{"owner":"user:guest","orgName":"ElaiShalevRH","repoName":"basic","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","workflowType":"infrastructure", "quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"cray","system":"Guest"}}' | jq .id | tr -d '"')
+        BASIC_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/basic-workflow-bootstrap","values":{"owner":"user:guest","orgName":"'$GITHUB_ORG'","repoName":"basic","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","workflowType":"infrastructure", "quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"test","system":"Guest"}}' | jq .id | tr -d '"')
         echo "BASIC_TASK_ID is $BASIC_TASK_ID"
         echo "BASIC_TASK_ID=$BASIC_TASK_ID" >> $GITHUB_ENV
     
     - name: Validate Basic Template Successs
-      run: | 
+      run: |
         sleep 20
         RESULT=$(curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$BASIC_TASK_ID" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status | tr -d '"')
         echo $RESULT
@@ -109,7 +109,7 @@ jobs:
         fi
 
         if [ "$RESULT" = "completed" ]; then 
-          echo "The Basic template was executed successfully. "
+          echo "The Basic template was executed successfully."
         fi
 
     - name: Export kind Logs
@@ -132,13 +132,7 @@ jobs:
       if: always()
       run: |
         echo "Deleting Created Repositories"
-        curl -X DELETE https://api.github.com/repos/ElaiShalevRH/advanced         -H "Authorization: Bearer $GITHUB_TOKEN"
-        curl -X DELETE https://api.github.com/repos/ElaiShalevRH/basic            -H "Authorization: Bearer $GITHUB_TOKEN"
-        curl -X DELETE https://api.github.com/repos/ElaiShalevRH/advanced-gitops  -H "Authorization: Bearer $GITHUB_TOKEN"
-        curl -X DELETE https://api.github.com/repos/ElaiShalevRH/basic-gitops     -H "Authorization: Bearer $GITHUB_TOKEN"
-
-        # Delete RHDH resources created (catalog etc)
-
-
-
-        
+        curl -X DELETE https://api.github.com/repos/$GITHUB_ORG/advanced         -H "Authorization: Bearer $GITHUB_TOKEN"
+        curl -X DELETE https://api.github.com/repos/$GITHUB_ORG/basic            -H "Authorization: Bearer $GITHUB_TOKEN"
+        curl -X DELETE https://api.github.com/repos/$GITHUB_ORG/advanced-gitops  -H "Authorization: Bearer $GITHUB_TOKEN"
+        curl -X DELETE https://api.github.com/repos/$GITHUB_ORG/basic-gitops     -H "Authorization: Bearer $GITHUB_TOKEN"
