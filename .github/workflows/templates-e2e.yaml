@@ -67,17 +67,18 @@ jobs:
         echo "Proxy Janus-idp port ✅"
 
         echo "NOW ADVANCED"
-        curl -X POST "http://localhost:9080/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/ElaiShalevRH/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/advanced-workflow/template.yaml"}'
+        curl -X POST "http://localhost:9080/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/ElaiShalevRH/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/advanced-workflow/template.yaml"}' | jq
 
         sleep 2
 
         echo "NOW BASIC"
-        curl -X POST "http://localhost:9080/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/ElaiShalevRH/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/basic-workflow/template.yaml"}'
+        curl -X POST "http://localhost:9080/api/catalog/locations" -H "Authorization: Bearer $BACKEND_TOKEN" -H 'Content-Type: application/json' -d '{"type":"url","target":"https://github.com/ElaiShalevRH/workflow-software-templates/blob/main/scaffolder-templates/github-workflows/basic-workflow/template.yaml"}' | jq
 
 
     - name: Run Advanced Template
       run: | 
         ADVANCED_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/advanced-workflow-bootstrap","values":{"owner":"user:guest","orgName":"ElaiShalevRH","repoName":"jft","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"cray","system":"Guest"}}' | jq .id | tr -d '"')
+        echo "ADVANCED_TASK_ID is $ADVANCED_TASK_ID"
         echo "ADVANCED_TASK_ID=$ADVANCED_TASK_ID" >> $GITHUB_ENV
     
     - name: Validate Advanced Template Successs
@@ -86,12 +87,12 @@ jobs:
         RESULT=$(curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$ADVANCED_TASK_ID" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status | tr -d '"')
         echo $RESULT
         if [ "$RESULT" = "failed" ]; then 
-          echo "The Basic template launched but failed to complete."
+          echo "The Advanced template launched but failed to complete."
           exit 1
         fi
 
         if [ "$RESULT" = "completed" ]; then 
-          echo "The Basic template was executed successfully."
+          echo "The Advanced template was executed successfully."
         fi
         
         
