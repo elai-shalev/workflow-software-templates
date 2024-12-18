@@ -77,7 +77,7 @@ jobs:
 
     - name: Run Advanced Template
       run: | 
-        ADVANCED_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/advanced-workflow-bootstrap","values":{"owner":"user:guest","orgName":"ElaiShalevRH","repoName":"jft","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"cray","system":"Guest"}}' | jq .id | tr -d '"')
+        ADVANCED_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/advanced-workflow-bootstrap","values":{"owner":"user:guest","orgName":"ElaiShalevRH","repoName":"axmas","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"cray","system":"Guest"}}' | jq .id | tr -d '"')
         echo "ADVANCED_TASK_ID is $ADVANCED_TASK_ID"
         echo "ADVANCED_TASK_ID=$ADVANCED_TASK_ID" >> $GITHUB_ENV
     
@@ -98,7 +98,7 @@ jobs:
         
     - name: Run Basic Template
       run: | 
-        BASIC_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/basic-workflow-bootstrap","values":{"owner":"user:guest","orgName":"ElaiShalevRH","repoName":"jftt","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","workflowType":"infrastructure", "quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"cray","system":"Guest"}}' | jq .id | tr -d '"')
+        BASIC_TASK_ID=$(curl -X POST "$BACKSTAGE_URL/api/scaffolder/v2/tasks" -H "Authorization: Bearer $BACKEND_TOKEN" -H "Content-Type: application/json" -d '{"templateRef":"template:default/basic-workflow-bootstrap","values":{"owner":"user:guest","orgName":"ElaiShalevRH","repoName":"bxmas","description":"This is a Test Repository","workflowId":"test","CI":"tekton_argocd","argocdNamespace":"argocd","infrastructureWorkflowId":"test","namespace":"sonataflow-operator-system","persistencePSQLDatabaseName":"sonataflow","persistencePSQLPasswordKey":"$PSQL_SECRET","persistencePSQLSecretName":"sonataflow-psql-postgresql","persistencePSQLServiceName":"orchestrator-postgresql","persistencePSQLServiceNamespace":"default","persistencePSQLServicePort":5432,"persistencePSQLUserKey":"$PSQL_SECRET","workflowType":"infrastructure", "quayConfig":"Use Existing Repository","quayOrgName":"testing-eshalev","quayRepoName":"cray","system":"Guest"}}' | jq .id | tr -d '"')
         
         echo "BASIC_TASK_ID is $BASIC_TASK_ID"
         echo "BASIC_TASK_ID=$BASIC_TASK_ID" >> $GITHUB_ENV
@@ -109,12 +109,12 @@ jobs:
         RESULT=$(curl -X GET "$BACKSTAGE_URL/api/scaffolder/v2/tasks/$BASIC_TASK_ID" -H "Authorization: Bearer $BACKEND_TOKEN" | jq .status | tr -d '"')
         echo "NOW"
         echo $RESULT
-        if [ "$RESULT" = "completed" ]; then 
+        if [ "$RESULT" = "failed" ]; then 
           echo "The Basic template launched but failed to complete."
           exit 1
         fi
 
-        if [ "$RESULT" = "success" ]; then 
+        if [ "$RESULT" = "completed" ]; then 
           echo "The Basic template was executed successfully. "
         fi
 
@@ -138,8 +138,13 @@ jobs:
     - name: Cleanup
       run: |
         echo "End to end tests passed ✅"
-          # Delete Repositories 
-          # Delete RHDH resources created (catalog etc)
+
+        curl -X DELETE https://api.github.com/repos/$GITHUB_ORG/axmas           -H "Authorization: Bearer $GITHUB_TOKEN"
+        curl -X DELETE https://api.github.com/repos/$GITHUB_ORG/bxmas    -H "Authorization: Bearer $GITHUB_TOKEN"
+        curl -X DELETE https://api.github.com/repos/$GITHUB_ORG/axmas-gitops           -H "Authorization: Bearer $GITHUB_TOKEN"
+        curl -X DELETE https://api.github.com/repos/$GITHUB_ORG/bxmas-gitops -H "Authorization: Bearer $GITHUB_TOKEN"
+
+        # Delete RHDH resources created (catalog etc)
 
 
 
