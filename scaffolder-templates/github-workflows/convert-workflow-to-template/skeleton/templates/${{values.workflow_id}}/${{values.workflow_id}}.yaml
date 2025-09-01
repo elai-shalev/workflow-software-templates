@@ -11,8 +11,17 @@ spec:
   system: red-hat-developer-hub
   type: service
 
-  # matches workflow's dataInputSchema
-  parameters: ${{values.parameters}}
+  parameters:
+    - title: Choose Target Entity
+      properties:
+        target_entity:
+          title: Target Entity for the workflow run
+          description: Select an entity from the catalog
+          ui:field: EntityPicker
+          ui:options:
+            catalogFilter:
+              kind: Component
+    ${{values.parameters}}
 
   steps:
     - id: runWorkflow
@@ -20,7 +29,8 @@ spec:
       action: orchestrator:workflow:run
       input:
         workflow_id: ${{values.workflow_id}}
-        parameters: {% raw %}${{ parameters }}{% endraw %}
+        target_entity: "{% raw %}${{ parameters.target_entity }}{% endraw %}"
+        parameters: "{% raw %}${{ parameters }}{% endraw %}"
 
   output:
     links:
