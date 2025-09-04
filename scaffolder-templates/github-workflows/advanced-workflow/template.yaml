@@ -27,7 +27,6 @@ spec:
         - repoName
         - workflowId
         - description
-        - workflowId
         - owner
         - system
       properties:
@@ -40,15 +39,15 @@ spec:
           title: Repository Name
           type: string
           description: Github repository name
-        description:
-          title: Description
-          type: string
-          description: Description added to the README file
         workflowId:
           title: Workflow ID
           type: string
           pattern: "^([a-z][a-z0-9]*)$" # java forbids hyphens '-', argocd requires lowercase alphanumeric, k8s forbids periods '.' and requires non-number start
           description: Unique identifier of the workflow in SonataFlow
+        description:
+          title: Description
+          type: string
+          description: Description added to the README file
         owner:
           title: Owner
           type: string
