@@ -29,6 +29,7 @@ spec:
         - orgName
         - repoName
         - workflowId
+        - gitlabHost
         - description
         - owner
         - system
@@ -43,6 +44,11 @@ spec:
           type: string
           description: Gitlab Project name
           default: onboarding
+        gitlabHost:
+          title: Gitlab Instance Name
+          type: string
+          default: gitlab-host
+          description: The name or host of your gitlab instance
         description:
           title: Description
           type: string
@@ -107,11 +113,6 @@ spec:
                   type: string
                   default: orchestrator-gitops
                   description: Deployment namespace for ArgoCD and Tekton resources
-                gitlabHost:
-                  title: Gitlab Instance Name
-                  type: string
-                  default: gitlab-host
-                  description: The name or host of your gitlab instance
                 persistencePSQLSecretName:
                   title: PostgreSQL Secret Name
                   type: string
